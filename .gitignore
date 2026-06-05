@@ -1,0 +1,21 @@
+# Python virtual environment
+.venv/
+
+# IDE
+.idea/
+
+# Database / Vector store
+chroma_db/
+
+# Logs
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Data files (optional, remove if you want to track these)
+data/
+
+# Environment variables / secrets
+.env
