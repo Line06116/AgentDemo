@@ -3,23 +3,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from server.routes.chat import router as chat_router
-from server.routes.documents import router as documents_router
-from server.routes.extract import router as extract_router
-
 app = FastAPI(title="企业知识问答 Agent")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.include_router(chat_router, prefix="/api")
-app.include_router(documents_router, prefix="/api")
-app.include_router(extract_router, prefix="/api")
 
 
 @app.get("/api/health")
