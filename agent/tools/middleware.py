@@ -1,62 +1,80 @@
+import time
 from typing import Callable
 
-from langchain.agents import AgentState
-from langchain.agents.middleware import wrap_tool_call, before_model, dynamic_prompt, ModelRequest
+from langchain.agents.middleware import wrap_tool_call, before_model
 from langchain.tools.tool_node import ToolCallRequest
 from langchain_core.messages import ToolMessage
-from langgraph.runtime import Runtime
 from langgraph.types import Command
 
 from utils.logger_handler import logger
-from utils.prompt_loader import load_report_prompt, load_system_prompt
 
 
-#工具执行的监控
+_event_emitter = None
+
+
+def set_event_emitter(emitter):
+    global _event_emitter
+    _event_emitter = emitter
+
+
+_step_counter = 0
+
+
+def _next_step() -> int:
+    global _step_counter
+    _step_counter += 1
+    return _step_counter
+
+
+def reset_step_counter():
+    global _step_counter
+    _step_counter = 0
+
+
 @wrap_tool_call
 def monitor_tool(
-        #请求的数据封装
-        request: ToolCallRequest,
-        #执行的函数本身
-        handler: Callable[[ToolCallRequest],ToolMessage | Command]
-
+    request: ToolCallRequest,
+    handler: Callable[[ToolCallRequest], ToolMessage | Command],
 ) -> ToolMessage | Command:
-    logger.info(f"[tool monitor]执行工具：{request.tool_call['name']}")
-    logger.info(f"[tool monitor]传入参数：{request.tool_call['args']}")
+    tool_name = request.tool_call["name"]
+    args = request.tool_call.get("args", {})
+    step = _next_step()
 
+    logger.info(f"[tool monitor] 执行工具: {tool_name}, 参数: {args}")
+
+    if _event_emitter and hasattr(_event_emitter, 'emit_thinking'):
+        _event_emitter.emit_thinking(
+            step=step,
+            tool=tool_name,
+            args=args,
+            reasoning=f"Agent 决定调用 {tool_name} 工具",
+        )
+
+    start = time.time()
     try:
         result = handler(request)
-        logger.info(f"[tool monitor]工具{request.tool_call['name']}调用成功")
+        duration_ms = int((time.time() - start) * 1000)
+        logger.info(f"[tool monitor] 工具 {tool_name} 调用成功 ({duration_ms}ms)")
 
-        if request.tool_call["name"] == "fill_context_for_report":
-            request.runtime.context["report"] = True
+        result_str = result.content if hasattr(result, 'content') else str(result)
+        if _event_emitter and hasattr(_event_emitter, 'emit_tool_result'):
+            _event_emitter.emit_tool_result(
+                step=step,
+                tool=tool_name,
+                result=result_str[:2000],
+                duration_ms=duration_ms,
+            )
+
         return result
     except Exception as e:
-        logger.error(f"工具{request.tool_call['name']}调用失败,错误信息:{str(e)}")
-        raise e
+        logger.error(f"[tool monitor] 工具 {tool_name} 调用失败: {e}")
+        raise
 
-#模型执行前输出日志
+
 @before_model
-def log_before_model(
-        state: AgentState,      #整个agent里的状态记录
-        runtime: Runtime,       #记录了整个执行过程中的上下文信息
-):
-    logger.info(f"[log_before_model]即将调用模型，带有{len(state['messages'])}条消息")
-    logger.debug(f"[log_before_model] {type(state['messages'][-1]).__name__} | {state['messages'][-1].content.strip()}")
-
+def log_before_model(state, runtime):
+    msgs = state.get("messages", [])
+    logger.info(f"[log_before_model] 即将调用模型，{len(msgs)} 条消息")
+    if msgs:
+        logger.debug(f"[log_before_model] 最后一条: {type(msgs[-1]).__name__}")
     return None
-
-#动态切换提示词
-@dynamic_prompt        #每一次在生成提示词之前调用此函数
-def report_prompt_switch(request: ModelRequest):
-    is_report = request.runtime.context.get("report",False)
-    if is_report:
-        return load_report_prompt()
-
-    return load_system_prompt()
-
-
-
-
-
-
-

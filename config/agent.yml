@@ -1,2 +1,4 @@
-external_data_path: data/external/records.csv
-weather_api: 6711b187da023ec0160a4421885a01b9
+# TODO: remove when agent_tools.py is refactored
+weather_api: ""
+external_data_path: ""
+serpapi_key: your_serpapi_key_here

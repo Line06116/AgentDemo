@@ -28,6 +28,13 @@ class VectorStoreService:
     def get_retriever(self):        #获取向量库的检索器
         return self.vector_store.as_retriever(search_kwargs={"k": chroma_conf["k"]})
 
+    @property
+    def collection(self):
+        return self.vector_store._collection
+
+    def add_documents(self, docs):
+        self.vector_store.add_documents(docs)
+
     def load_document(self):
 
         def check_md5(md5_for_check: str):
