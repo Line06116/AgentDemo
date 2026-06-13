@@ -33,7 +33,9 @@ class VectorStoreService:
         return self.vector_store._collection
 
     def add_documents(self, docs):
-        self.vector_store.add_documents(docs)
+        split_docs = self.spliter.split_documents(docs)
+        self.vector_store.add_documents(split_docs)
+        return len(split_docs)
 
     def load_document(self):
 
