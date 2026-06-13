@@ -27,7 +27,7 @@ class RagSummarizeService(object):
 
 
     def _init_chain(self):
-        chain = self.prompt_template | print_prompt | self.model | StrOutputParser()
+        chain = self.prompt_template | self.model | StrOutputParser()
         return chain
 
     def retriever_docs(self,query: str) -> list[Document]:

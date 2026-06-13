@@ -4,6 +4,6 @@ k: 3
 data_path: data
 md5_hex_store: md5.text
 allow_knowledge_file_type: ["txt","pdf"]
-chunk_size: 200
-chunk_overlap: 20
+chunk_size: 800
+chunk_overlap: 80
 separators: ["\n\n","\n",".","!","?","。","！","？"," ",""]

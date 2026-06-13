@@ -7,9 +7,15 @@ const files = ref<{ name: string; size_display: string }[]>([])
 const uploadStatus = ref('')
 
 async function loadFiles() {
-  const resp = await fetch('/api/documents')
-  const data = await resp.json()
-  files.value = data.files
+  try {
+    const resp = await fetch('/api/documents')
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    const data = await resp.json()
+    files.value = data.files || []
+  } catch (err: any) {
+    console.error('加载文件列表失败:', err.message)
+    files.value = []
+  }
 }
 
 async function handleUpload(e: Event) {
@@ -33,7 +39,11 @@ async function handleUpload(e: Event) {
 }
 
 async function handleDelete(filename: string) {
-  await fetch(`/api/documents/${encodeURIComponent(filename)}`, { method: 'DELETE' })
+  try {
+    await fetch(`/api/documents/${encodeURIComponent(filename)}`, { method: 'DELETE' })
+  } catch (err: any) {
+    console.error('删除文件失败:', err.message)
+  }
   loadFiles()
 }
 
