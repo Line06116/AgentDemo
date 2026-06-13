@@ -8,15 +8,12 @@ class EventEmitter:
 
     def __init__(self):
         self._queue: asyncio.Queue[str] = asyncio.Queue()
+        self._loop = asyncio.get_running_loop()
 
     def push(self, event_type: str, data: dict[str, Any]) -> None:
         """同步线程安全地将事件推入异步队列。"""
         payload = f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            return
-        loop.call_soon_threadsafe(self._queue.put_nowait, payload)
+        self._loop.call_soon_threadsafe(self._queue.put_nowait, payload)
 
     def emit_thinking(
         self, step: int, tool: str, args: dict, reasoning: str

@@ -18,7 +18,8 @@
       "Bash(taskkill //F //IM uvicorn.exe)",
       "Bash(taskkill //F //IM python.exe)",
       "Bash(rm -rf chroma_db)",
-      "Bash(rm -f data/documents/.md5_records data/documents/*.pdf)"
+      "Bash(rm -f data/documents/.md5_records data/documents/*.pdf)",
+      "WebSearch"
     ]
   }
 }
