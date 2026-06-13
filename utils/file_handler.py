@@ -14,7 +14,7 @@ def get_file_md5_hex(filepath:str):
 
     chunk_size = 4096       #4kb,避免文件过大
     try:
-        with open(filepath,"rb") as f:
+        with open(filepath,"rb") as f:  #以二进制方式只读文件
             while chunk :=f.read(chunk_size):       #:= 先赋值再使用
                 md5_obj.update(chunk)
 
@@ -28,14 +28,14 @@ def get_file_md5_hex(filepath:str):
 def list_with_allowed_type(path:str,allowed_types:tuple[str]):
     files = []
 
-    if not os.path.isdir(path):
+    if not os.path.isdir(path):     #判断是否是文件夹
         logger.error(f"[listdir_with_allowed_type]{path}不是文件夹")
         return allowed_types
     for f in os.listdir(path):
-        if f.endswith(allowed_types):
+        if f.endswith(allowed_types):          #判断文件类型
             files.append(os.path.join(path,f))
 
-    return tuple(files)
+    return tuple(files)     #tuple类型不可变，防止误修改
 
 
 
@@ -47,5 +47,12 @@ def txt_loader(filepath: str) -> list[Document]:
     return TextLoader(filepath,encoding="utf-8").load()
 
 
+
+"""
+定义get_file_md5_hex(filepath:str)方法，传入一个文件路径，先判断是否存在及是否为文件，
+随后调用hashlib中的md5（）方法，创建MD5对象，用于后续转化字符串
+
+按照实现定义好的chunk_size大小，分段存入MD5对象中，避免内存过大
+"""
 
 

@@ -9,8 +9,8 @@ from agent.react_agent import ReactAgent
 st.title("智扫通机器人智能客服")
 st.divider()
 
-if "agent" not in st.session_state:
-    st.session_state.agent = ReactAgent()
+if "Agent" not in st.session_state:
+    st.session_state.Agent = ReactAgent()
 
 if "message" not in st.session_state:
     st.session_state["message"]= []
@@ -27,7 +27,7 @@ if prompt:
     st.session_state["message"].append({"role": "user","content": prompt})
     response_messages = []
     with st.spinner("智能客服思考中"):
-        res_stream = st.session_state["agent"].excute_stream(prompt)
+        res_stream = st.session_state["Agent"].excute_stream(prompt)
         def capture(generator,cache_list):
             for chunk in generator:
                 cache_list.append(chunk)

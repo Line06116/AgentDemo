@@ -41,7 +41,7 @@ def load_rag_prompt():
 
 def load_report_prompt():
     """
-    加载系统提示语
+    加载报告提示语
     :return:
     """
     try:
@@ -59,4 +59,4 @@ def load_report_prompt():
 
 
 if __name__ == '__main__':
-    print(load_rag_prompt())
+    print(load_rag_prompt() )
