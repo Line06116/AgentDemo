@@ -48,11 +48,9 @@ def txt_loader(filepath: str) -> list[Document]:
 
 
 
-"""
-定义get_file_md5_hex(filepath:str)方法，传入一个文件路径，先判断是否存在及是否为文件，
-随后调用hashlib中的md5（）方法，创建MD5对象，用于后续转化字符串
-
-按照实现定义好的chunk_size大小，分段存入MD5对象中，避免内存过大
-"""
+def md_loader(file_path: str) -> list:
+    from langchain_community.document_loaders import UnstructuredMarkdownLoader
+    loader = UnstructuredMarkdownLoader(file_path)
+    return loader.load()
 
 

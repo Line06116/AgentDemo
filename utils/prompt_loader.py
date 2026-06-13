@@ -58,5 +58,12 @@ def load_report_prompt():
 
 
 
+def load_extract_prompt(config_path: str | None = None):
+    if config_path is None:
+        config_path = prompts_conf["extract_prompt_path"]
+    with open(get_abs_path(config_path), "r", encoding="utf-8") as f:
+        return f.read()
+
+
 if __name__ == '__main__':
     print(load_rag_prompt() )
