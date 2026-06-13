@@ -1,4 +1,5 @@
 import asyncio
+import json
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -34,28 +35,33 @@ async def chat(req: ChatRequest):
     emitter = EventEmitter()
 
     async def event_generator():
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         queue = await emitter.get_queue()
         session_manager.add_message(req.session_id, "user", req.message)
 
         full_response = ""
+        finished = False
 
         def run_agent():
-            nonlocal full_response
-            for text in _agent.execute_stream(req.message, event_emitter=emitter):
-                full_response += text + "\n"
+            nonlocal full_response, finished
+            try:
+                for text in _agent.execute_stream(req.message, event_emitter=emitter):
+                    full_response += text
+            except Exception as e:
+                emitter.emit_error(str(e))
+            finally:
+                finished = True
+                emitter.emit_done()
 
-        try:
-            await loop.run_in_executor(None, run_agent)
-            session_manager.add_message(req.session_id, "assistant", full_response)
-            emitter.emit_done()
-        except Exception as e:
-            emitter.emit_error(str(e))
+        loop.run_in_executor(None, run_agent)
 
-        while True:
-            data = await queue.get()
-            yield data
-            if '"done"' in data.replace(" ", "") or '"error"' in data.replace(" ", ""):
-                break
+        while not finished or not queue.empty():
+            try:
+                data = await asyncio.wait_for(queue.get(), timeout=0.1)
+                yield data
+            except asyncio.TimeoutError:
+                continue
+
+        session_manager.add_message(req.session_id, "assistant", full_response)
 
     return EventSourceResponse(event_generator())
