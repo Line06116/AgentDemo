@@ -14,7 +14,11 @@ app.add_middleware(
 )
 
 from server.routes.chat import router as chat_router
+from server.routes.documents import router as documents_router
+from server.routes.extract import router as extract_router
 app.include_router(chat_router, prefix="/api")
+app.include_router(documents_router, prefix="/api")
+app.include_router(extract_router, prefix="/api")
 
 
 @app.get("/api/health")
