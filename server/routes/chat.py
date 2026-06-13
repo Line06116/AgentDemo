@@ -57,8 +57,8 @@ async def chat(req: ChatRequest):
 
         while not finished or not queue.empty():
             try:
-                data = await asyncio.wait_for(queue.get(), timeout=0.1)
-                yield data
+                event = await asyncio.wait_for(queue.get(), timeout=0.1)
+                yield event
             except asyncio.TimeoutError:
                 continue
 
