@@ -19,5 +19,8 @@ data/
 !data/documents/
 !data/documents/.gitkeep
 
+# Frontend dependencies
+node_modules/
+
 # Environment variables / secrets
 .env
