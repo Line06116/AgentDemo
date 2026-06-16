@@ -25,8 +25,12 @@ class VectorStoreService:
             length_function=len
         )
 
-    def get_retriever(self):        #获取向量库的检索器
+    def get_retriever(self):
         return self.vector_store.as_retriever(search_kwargs={"k": chroma_conf["k"]})
+
+    def search_with_score(self, query: str, k: int | None = None) -> list[tuple[Document, float]]:
+        k = k or chroma_conf.get("retrieval_k", 20)
+        return self.vector_store.similarity_search_with_score(query, k=k)
 
     @property
     def collection(self):

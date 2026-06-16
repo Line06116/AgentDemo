@@ -89,13 +89,10 @@ onMounted(loadFiles)
 
 <style scoped>
 .knowledge-panel {
-  width: var(--sidebar-width);
-  height: 100%;
-  background: var(--bg-white);
-  border-right: 1px solid var(--border-color);
+  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
 }
 .tabs {
   display: flex;

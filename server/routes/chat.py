@@ -26,6 +26,33 @@ async def create_session():
     }
 
 
+@router.get("/sessions")
+async def list_sessions():
+    return session_manager.list_all()
+
+
+@router.get("/session/{session_id}")
+async def get_session(session_id: str):
+    session = session_manager.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    return {
+        "session_id": session.session_id,
+        "user_id": session.user_id,
+        "title": session.title,
+        "messages": session.messages,
+        "extract_result": session.extract_result,
+        "created_at": session.created_at,
+    }
+
+
+@router.delete("/session/{session_id}")
+async def delete_session(session_id: str):
+    if not session_manager.delete(session_id):
+        raise HTTPException(status_code=404, detail="会话不存在")
+    return {"ok": True}
+
+
 @router.post("/chat")
 async def chat(req: ChatRequest):
     session = session_manager.get(req.session_id)

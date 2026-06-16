@@ -1,3 +1,4 @@
 main_prompt_path: prompts/main_prompt.txt
 rag_summarize_prompt_path: prompts/rag_summarize.txt
 extract_prompt_path: prompts/extract_prompt.txt
+rerank_prompt_path: prompts/rerank.txt

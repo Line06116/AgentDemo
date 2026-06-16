@@ -24,3 +24,9 @@ node_modules/
 
 # Environment variables / secrets
 .env
+
+# Claude local settings
+.claude/
+
+# Secrets (API keys)
+config/agent.yml
