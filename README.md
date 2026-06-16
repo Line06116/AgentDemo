@@ -1,6 +1,6 @@
-# 企业知识问答智能 Agent
+# 知识库问答Agent
 
-基于 LangChain ReAct Agent + RAG 的企业知识库智能问答系统，支持多工具调用、SSE 流式响应、知识萃取与导出。
+基于 LangChain ReAct Agent + RAG 的知识库问答系统，支持多工具调用、SSE 流式响应、知识萃取与导出。
 
 **前端：** Vue 3 + TypeScript + Pinia + Vite  
 **后端：** FastAPI + LangChain + Chroma + SSE
